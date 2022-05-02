@@ -8,8 +8,8 @@ class App
 {
     private static $_instance = null;
 
-    private function __construct()
-    {
+    private function __construct() {
+        \GF\Loader::registerNamespace('GF', dirname(__FILE__) . DIRECTORY_SEPARATOR);
         \GF\Loader::registerAutoload();
     }
 
