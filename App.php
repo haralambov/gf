@@ -8,6 +8,10 @@ class App
 {
     private static $_instance = null;
     private $_config = null;
+    /**
+     * @var \GF\FrontController
+     */
+    private $_frontController = null;
 
     private function __construct() {
         \GF\Loader::registerNamespace('GF', dirname(__FILE__) . DIRECTORY_SEPARATOR);
@@ -35,6 +39,8 @@ class App
         if ($this->_config->getConfigFolder() == null) {
             $this->_config->setConfigFolder('../config');
         }
+        $this->_frontController = \GF\FrontController::getInstance();
+        $this->_frontController->dispatch();
     }
 
     /**
