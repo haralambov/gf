@@ -21,7 +21,8 @@ class FrontController
 
     public function dispatch() {
         $router = new \GF\Routers\DefaultRouter();
-        $router->getURI();
+        $_uri = $router->getURI();
+        $routes = \GF\App::getInstance()->getConfig()->routes;
     }
 
     public function getDefaultController() {
