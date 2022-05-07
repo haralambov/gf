@@ -9,7 +9,7 @@ class DefaultRouter
     private $params = array();
 
     public function parse() {
-        $_uri = substr($_SERVER['SCRIPT_NAME'], strlen($_SERVER['PHP_SELF']) + 1);
+        $_uri = substr($_SERVER['PHP_SELF'], strlen($_SERVER['SCRIPT_NAME']) + 1);
         $_params = explode('/', $_uri);
         if ($_params[0]) {
             $this->controller = ucfirst($_params[0]);
