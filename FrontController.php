@@ -49,10 +49,10 @@ class FrontController
 
         $_params = explode('/', $_uri);
         if ($_params[0]) {
-            $this->controller = $_params[0];
+            $this->controller = strtolower($_params[0]);
             // if we do not have controller and method, we do not have params
             if ($_params[1]) {
-                $this->method = $_params[1];
+                $this->method = strtolower($_params[1]);
             } else {
                 $this->method = $this->getDefaultMethod();
             }
@@ -61,14 +61,16 @@ class FrontController
             $this->method = $this->getDefaultMethod();
         }
 
-        if (is_array($_rc) && $_rc['controllers'] && $_rc['controllers'][$this->controller]['to']) {
+        if (is_array($_rc) && $_rc['controllers']) {
             if ($_rc['controllers'][$this->controller]['methods'][$this->method]) {
-                $this->method = $_rc['controllers'][$this->controller]['methods'][$this->method];
+                $this->method = strtolower($_rc['controllers'][$this->controller]['methods'][$this->method]);
             }
-            $this->controller = $_rc['controllers'][$this->controller]['to'];
+            if (isset($_rc['controllers'][$this->controller]['to'])) {
+                $this->controller = strtolower($_rc['controllers'][$this->controller]['to']);
+            }
         }
 
-        $f = $this->ns . '\\' . $this->controller;
+        $f = $this->ns . '\\' . ucfirst($this->controller);
         $newController = new $f();
         $newController->{$this->method}();
     }
@@ -76,15 +78,15 @@ class FrontController
     public function getDefaultController() {
         $controller = \GF\App::getInstance()->getConfig()->app['default_controller'];
         if ($controller) {
-            return $controller;
+            return strtolower($controller);
         }
-        return 'Index';
+        return 'index';
     }
 
     public function getDefaultMethod() {
         $method = \GF\App::getInstance()->getConfig()->app['default_method'];
         if ($method) {
-            return $method;
+            return strtolower($method);
         }
         return 'index';
     }
