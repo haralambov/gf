@@ -61,13 +61,16 @@ class FrontController
             $this->method = $this->getDefaultMethod();
         }
 
-        if (is_array($_rc) && $_rc['controllers'] && $_rc['controllers'][$this->controller]) {
-            $this->controller = $_rc['controllers'][$this->controller];
+        if (is_array($_rc) && $_rc['controllers'] && $_rc['controllers'][$this->controller]['to']) {
+            if ($_rc['controllers'][$this->controller]['methods'][$this->method]) {
+                $this->method = $_rc['controllers'][$this->controller]['methods'][$this->method];
+            }
+            $this->controller = $_rc['controllers'][$this->controller]['to'];
         }
 
-        echo $this->ns . '<br>';
-        echo $this->controller . '<br>';
-        echo $this->method . '<br>';
+        $f = $this->ns . '\\' . $this->controller;
+        $newController = new $f();
+        $newController->{$this->method}();
     }
 
     public function getDefaultController() {
