@@ -9,6 +9,9 @@ class FrontController
     private function __construct() {
     }
 
+    /**
+     * @return \GF\FrontController
+     */
     public static function getInstance() {
         if (self::$_instance == null) {
             self::$_instance = new \GF\FrontController();
@@ -17,6 +20,7 @@ class FrontController
     }
 
     public function dispatch() {
-
+        $r = new \GF\Routers\DefaultRouter();
+        $r->parse();
     }
 }
