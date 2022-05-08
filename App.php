@@ -12,6 +12,7 @@ class App
      * @var \GF\FrontController
      */
     private $_frontController = null;
+    private $router = null;
 
     private function __construct() {
         \GF\Loader::registerNamespace('GF', dirname(__FILE__) . DIRECTORY_SEPARATOR);
@@ -27,6 +28,14 @@ class App
         return $this->_config->getConfigFolder();
     }
 
+    public function getRouter() {
+        return $this->router;
+    }
+
+    public function setRouter($router) {
+        $this->router = $router;
+    }
+
     /**
      * @return \GF\Config
      */
@@ -40,6 +49,19 @@ class App
             $this->_config->setConfigFolder('../config');
         }
         $this->_frontController = \GF\FrontController::getInstance();
+        if ($this->router instanceof \GF\Routers\IRouter) {
+            $this->_frontController->setRouter($this->router);
+        }
+        else if ($this->router == 'JsonRPCRouter') {
+            //TODO fix it when RPC is done
+            $this->_frontController->setRouter(new \GF\Routers\DefaultRouter());
+        }
+        else if ($this->router == 'CLIRouter') {
+            //TODO fix it when RPC is done
+            $this->_frontController->setRouter(new \GF\Routers\DefaultRouter());
+        } else {
+            $this->_frontController->setRouter(new \GF\Routers\DefaultRouter());
+        }
         $this->_frontController->dispatch();
     }
 

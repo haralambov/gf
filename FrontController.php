@@ -8,6 +8,7 @@ class FrontController
     private $ns = null;
     private $controller = null;
     private $method = null;
+    private $router = null;
 
     private function __construct() {
     }
@@ -22,9 +23,19 @@ class FrontController
         return self::$_instance;
     }
 
+    public function getRouter() {
+        return $this->router;
+    }
+
+    public function setRouter(\GF\Routers\IRouter $router) {
+        $this->router = $router;
+    }
+
     public function dispatch() {
-        $router = new \GF\Routers\DefaultRouter();
-        $_uri = $router->getURI();
+        if ($this->getRouter() == null) {
+            throw new \Exception('No valid router found', 500);
+        }
+        $_uri = $this->getRouter()->getURI();
         $routes = \GF\App::getInstance()->getConfig()->routes;
         $_rc = null;
         if (is_array($routes) && count($routes) > 0) {
