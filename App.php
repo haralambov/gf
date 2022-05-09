@@ -13,6 +13,7 @@ class App
      */
     private $_frontController = null;
     private $router = null;
+    private $_dbConnections = array();
 
     private function __construct() {
         \GF\Loader::registerNamespace('GF', dirname(__FILE__) . DIRECTORY_SEPARATOR);
@@ -63,6 +64,27 @@ class App
             $this->_frontController->setRouter(new \GF\Routers\DefaultRouter());
         }
         $this->_frontController->dispatch();
+    }
+
+    public function getConnection($connection = 'default') {
+        if (!$connection) {
+            throw new \Exception('No connection identifier provided', 500);
+        }
+        if ($this->_dbConnections[$connection]) {
+            return $this->_dbConnections[$connection];
+        }
+        $_cnf = $this->getConfig()->database;
+        if (!$_cnf[$connection]) {
+            throw new \Exception('No valid connection identifier is provided', 500);
+        }
+        $dbh = new \PDO(
+            $_cnf[$connection]['connection_uri'],
+            $_cnf[$connection]['username'],
+            $_cnf[$connection]['password'],
+            $_cnf[$connection]['pdo_options']
+        );
+        $this->_dbConnections[$connection] = $dbh;
+        return $dbh;
     }
 
     /**
