@@ -66,7 +66,7 @@ class App
         $this->_frontController->dispatch();
     }
 
-    public function getConnection($connection = 'default') {
+    public function getDBConnection($connection = 'default') {
         if (!$connection) {
             throw new \Exception('No connection identifier provided', 500);
         }
