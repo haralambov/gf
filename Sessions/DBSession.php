@@ -10,7 +10,7 @@ class DBSession extends \GF\DB\SimpleDB implements \GF\Sessions\ISession {
     private $path;
     private $domain;
     private $secure;
-    private $sessionId;
+    private $sessionId = null;
     private $sessoinData = array();
 
     public function __construct($dbConnection, $name, $tableName = 'sessoins', $lifetime = 3600, $path = null, $domain = null, $secure = false) {
@@ -23,6 +23,10 @@ class DBSession extends \GF\DB\SimpleDB implements \GF\Sessions\ISession {
         $this->secure = $secure;
         $this->sessionId = $_COOKIE[$name];
 
+        if (rand(0, 50) == 1) {
+            $this->_gc();
+        }
+
         if (strlen($this->sessionId) < 32) {
             $this->_startNewSession();
         } else if (!$this->_validateSession()) {
@@ -30,17 +34,23 @@ class DBSession extends \GF\DB\SimpleDB implements \GF\Sessions\ISession {
         }
     }
 
-    public function getSessionId() { }
+    public function getSessionId() {
+        return $this->getSessionId;
+    }
 
     public function saveSession() {
         if ($this->sessionId) {
-            $this->prepare('UPDATE ' . $this->tableName . ' SET sess_date=?, valid_until=? WHERE sessid=?')
+            $this->prepare('UPDATE ' . $this->tableName . ' SET sess_data=?, valid_until=? WHERE sessid=?')
                 ->execute(array(serialize($this->sessoinData), time() + $this->lifetime, $this->sessionId));
             setcookie($this->sessionName, $this->sessionId, time() + $this->lifetime, $this->path, $this->domain, $this->secure, true);
         }
     }
 
-    public function destroySession() { }
+    public function destroySession() {
+        if ($this->sessionId) {
+            $this->prepare('DELETE FROM ' . $this->tableName . ' WHERE sessid=?', array($this->sessionId))->execute();
+        }
+    }
 
     public function __get($name) {
         return $this->sessoinData[$name];
@@ -71,5 +81,9 @@ class DBSession extends \GF\DB\SimpleDB implements \GF\Sessions\ISession {
         $this->prepare('INSERT INTO ' . $this->tableName . ' (sessid, valid_until) VALUES (?, ?)')
             ->execute(array($this->sessionId, time() + $this->lifetime));
         setcookie($this->sessionName, $this->sessionId, time() + $this->lifetime, $this->path, $this->domain, $this->secure, true);
+    }
+
+    private function _gc() {
+        $this->prepare('DELETE FROM ' . $this->tableName . ' WHERE valid_until<?', array(time()))->execute();
     }
 }
