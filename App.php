@@ -14,6 +14,7 @@ class App
     private $_frontController = null;
     private $router = null;
     private $_dbConnections = array();
+    private $_session = null;
 
     private function __construct() {
         \GF\Loader::registerNamespace('GF', dirname(__FILE__) . DIRECTORY_SEPARATOR);
@@ -63,7 +64,24 @@ class App
         } else {
             $this->_frontController->setRouter(new \GF\Routers\DefaultRouter());
         }
+
+        $_sess = $this->_config->app['session'];
+        if ($_sess['autostart']) {
+            if ($_sess['type'] == 'native') {
+                $this->setSession(new \GF\Sessions\NativeSession($_sess['name'], $_sess['lifetime'], $_sess['path'], $_sess['domain'], $_sess['secure']));
+            }
+        }
+
         $this->_frontController->dispatch();
+    }
+
+    /** @return \GF\Sessions\ISession  */
+    public function getSession() {
+        return $this->_session;
+    }
+
+    public function setSession(\GF\Sessions\ISession $session) {
+        $this->_session = $session;
     }
 
     public function getDBConnection($connection = 'default') {

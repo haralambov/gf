@@ -2,7 +2,7 @@
 
 namespace GF\Sessions;
 
-class NativeSession implements \Gf\Sessions\ISession {
+class NativeSession implements \GF\Sessions\ISession {
 
     public function __construct($name, $lifetime = 3600, $path = null, $domain = null, $secure = false) {
         if (strlen($name) < 1) {
