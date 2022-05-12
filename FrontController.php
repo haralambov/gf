@@ -58,12 +58,15 @@ class FrontController
             throw new \Exception('Default route missing', 500);
         }
 
+        $input = \GF\InputData::getInstance();
         $_params = explode('/', $_uri);
         if ($_params[0]) {
             $this->controller = strtolower($_params[0]);
             // if we do not have controller and method, we do not have params
             if ($_params[1]) {
                 $this->method = strtolower($_params[1]);
+                unset($_params[0], $_params[1]);
+                $input->setGet(array_values($_params));
             } else {
                 $this->method = $this->getDefaultMethod();
             }
@@ -80,6 +83,8 @@ class FrontController
                 $this->controller = strtolower($_rc['controllers'][$this->controller]['to']);
             }
         }
+
+        $input->setPost($this->router->getPost());
 
         $f = $this->ns . '\\' . ucfirst($this->controller);
         $newController = new $f();

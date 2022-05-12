@@ -6,6 +6,7 @@ class JsonRPCRouter implements \GF\Routers\IRouter {
 
     private $_map = array();
     private $_requestId;
+    private $_post = array();
 
     public function __construct() {
         if ($_SERVER['REQUEST_METHOD'] != 'POST' || empty($_SERVER['CONTENT_TYPE']) || $_SERVER['CONTENT_TYPE'] != 'application/json') {
@@ -17,6 +18,10 @@ class JsonRPCRouter implements \GF\Routers\IRouter {
         if (is_array($ar)) {
             $this->_map = $ar;
         }
+    }
+
+    public function getPost() {
+        return $this->_post;
     }
 
     public function getURI() {
@@ -35,6 +40,7 @@ class JsonRPCRouter implements \GF\Routers\IRouter {
         } else {
             if ($this->_map[$request['method']]) {
                 $this->_requestId = $request['id'];
+                $this->_post = $request['params'];
                 return $this->_map[$request['method']];
             } else {
                 throw new \Exception('Method not found', 501);
