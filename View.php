@@ -91,7 +91,7 @@ class View {
     }
 
     /** @return \GF\View  */
-    public function getInstance() {
+    public static function getInstance() {
         if (self::$___instance == null) {
             self::$___instance = new \GF\View();
         }

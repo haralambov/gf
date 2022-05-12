@@ -17,6 +17,7 @@ class App
     private $_session = null;
 
     private function __construct() {
+        set_exception_handler(array($this, '_exceptionHandler'));
         \GF\Loader::registerNamespace('GF', dirname(__FILE__) . DIRECTORY_SEPARATOR);
         \GF\Loader::registerAutoload();
         $this->_config = \GF\Config::getInstance();
@@ -117,6 +118,25 @@ class App
             self::$_instance = new \GF\App();
         }
         return self::$_instance;
+    }
+
+    public function _exceptionHandler(\Exception $ex) {
+        if ($tihs->_config && $this->_config->app['displayExceptions'] == true) {
+            echo '<pre>' . print_r($ex, true) . '</pre>';
+        } else {
+            $this->displayError($ex->getCode());
+        }
+    }
+
+    public function displayError($error) {
+        try {
+            $view = \GF\View::getInstance();
+            $view->display('error.' . $error);
+        } catch(\Exception $ex) {
+            \GF\Common::headerStatus($error);
+            echo '<h1>' . $error . '</h1>';
+            exit;
+        }
     }
 
     public function __destruct() {
